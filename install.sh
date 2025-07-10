@@ -2,17 +2,21 @@
 
 set -e
 
-# 📍 Use the directory this script is in
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_ROOT="$SCRIPT_DIR"
+REPO_URL="https://github.com/ahmadfirdaus06/node-app-module-utils.git"
+TMP_DIR=".tmp_module_clone"
+SCRIPT_NAME=$(basename "$0")
+
+echo "📦 Cloning full module repo..."
+rm -rf "$TMP_DIR"
+git clone "$REPO_URL" "$TMP_DIR" > /dev/null
 
 echo ""
-echo "📦 Available modules in '$SOURCE_ROOT':"
+echo "📦 Scanning for installable modules..."
 MODULES=()
 i=1
 
-for dir in "$SOURCE_ROOT"/*/; do
-  if [ -f "${dir}install.js" ]; then
+for dir in "$TMP_DIR"/*/; do
+  if [ -f "$dir/install.js" ]; then
     MODULE_NAME=$(basename "$dir")
     echo "  $i. $MODULE_NAME"
     MODULES+=("$MODULE_NAME")
@@ -22,49 +26,57 @@ done
 
 if [ ${#MODULES[@]} -eq 0 ]; then
   echo "❌ No modules with install.js found."
+  rm -rf "$TMP_DIR"
   exit 1
 fi
 
 echo ""
-read -p "Select a module to clone (number): " MOD_INDEX
-MOD_INDEX=$((MOD_INDEX - 1))
-SELECTED_MODULE=${MODULES[$MOD_INDEX]}
+read -p "Select a module to install (number): " sel
+sel=$((sel-1))
+MODULE="${MODULES[$sel]}"
 
-if [ -z "$SELECTED_MODULE" ]; then
+if [ -z "$MODULE" ]; then
   echo "❌ Invalid selection."
+  rm -rf "$TMP_DIR"
   exit 1
 fi
 
 echo ""
-read -p "📁 Enter install path relative to current project (e.g. modules/$SELECTED_MODULE): " REL_DEST_PATH
+read -p "📁 Enter install path relative to current project (e.g. modules/$MODULE): " REL_DEST
 
 CWD=$(pwd)
-FULL_DEST="$CWD/$REL_DEST_PATH"
-FULL_SRC="$SOURCE_ROOT/$SELECTED_MODULE"
+SRC="$TMP_DIR/$MODULE"
+DEST="$CWD/$REL_DEST"
 
 echo ""
-echo "📦 Copying '$SELECTED_MODULE' to '$REL_DEST_PATH'..."
-mkdir -p "$FULL_DEST"
-cp -r "$FULL_SRC"/* "$FULL_DEST"
+echo "📦 Copying module '$MODULE' to '$REL_DEST'..."
+mkdir -p "$DEST"
+cp -r "$SRC/"* "$DEST"
 
-# ✅ Ensure root has package.json
+# Ensure root package.json exists
 if [ ! -f "$CWD/package.json" ]; then
   echo ""
   echo "📄 Root package.json not found. Running 'npm init -y'..."
   npm init -y
 fi
 
+# Run install.js
 echo ""
-echo "📦 Installing dependencies via install.js into root project..."
-node "$FULL_DEST/install.js"
+echo "📦 Installing module dependencies..."
+node "$DEST/install.js"
+
+# Cleanup module files
+echo ""
+echo "🧹 Cleaning up module install files..."
+rm -f "$DEST/install.js"
+rm -f "$DEST/package.json"
+rm -f "$DEST/package-lock.json"
+rm -rf "$DEST/node_modules"
+rm -rf "$DEST/examples"
+
+# Cleanup cloned repo
+rm -rf "$TMP_DIR"
 
 echo ""
-echo "🧹 Cleaning up module files..."
-rm -f "$FULL_DEST/package.json"
-rm -f "$FULL_DEST/package-lock.json"
-rm -rf "$FULL_DEST/node_modules"
-rm -f "$FULL_DEST/install.js"
-rm -rf "$FULL_DEST/examples"
-
-echo ""
-echo "✅ Done. Module installed to './$REL_DEST_PATH' and cleaned."
+echo "✅ Module '$MODULE' installed to './$REL_DEST' and cleaned."
+echo "📦 Source: $REPO_URL"
