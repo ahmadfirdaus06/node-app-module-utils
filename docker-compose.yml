@@ -1,0 +1,16 @@
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - "127.0.0.1:27017:27017"
+    restart: unless-stopped
+    volumes:
+      - db-data:/data/db
+  redis:
+    image: redis:latest
+    ports:
+      - "127.0.0.1:6379:6379"
+    restart: unless-stopped
+
+volumes:
+  db-data:

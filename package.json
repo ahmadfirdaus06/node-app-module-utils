@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^30.0.4",
+    "supertest": "^7.1.3"
+  },
+  "jest": {
+    "testMatch": [
+      "**/?(*.)+(spec).js"
+    ]
+  },
+  "name": "node-app-module-utils",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Ahmad Firdaus",
+  "license": "MIT",
+  "description": ""
+}

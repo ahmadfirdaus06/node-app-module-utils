@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "start": "nodemon ."
+  },
+  "name": "basic-app-login-auth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

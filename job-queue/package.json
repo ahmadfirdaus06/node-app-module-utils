@@ -1,0 +1,16 @@
+{
+  "name": "app-utils-job-queue",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "bee-queue": "^1.7.1",
+    "dotenv": "^17.2.0",
+    "mongoose": "^8.16.2"
+  }
+}
